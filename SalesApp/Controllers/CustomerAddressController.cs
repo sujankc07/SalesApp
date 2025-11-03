@@ -39,7 +39,7 @@ namespace SalesApp.Controllers
             return Ok(newAddress);
         }
 
-        [HttpGet("getAddresses/{custNo}")]
+        [HttpGet]
         public IActionResult GetAddresses(string custNo)
         {
             var primaryAddress = _customerContext.Customers

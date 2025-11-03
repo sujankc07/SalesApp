@@ -6,7 +6,10 @@ using Microsoft.IdentityModel.Tokens;
 using SalesApp;
 using SalesApp.Data;
 using SalesApp.Services;
+using SalesApp.Soap_Endpoint;
 using Serilog;
+using SoapCore;
+using System.ServiceModel;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +58,11 @@ builder.Services.AddDbContext<CustomerAddressDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("dbcon")));
 
 
+
+// Register the SOAP service
+builder.Services.AddScoped<IOrderSoapService, OrderSoapService>();
+
+
 //CONFIGURE SERILOG TO LOG REQ AND RES TO FILE
 //builder.Host.UseSerilog((context, services, configuration) => configuration
 //.ReadFrom.Configuration(context.Configuration)
@@ -74,7 +82,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("dbcon")));
 
 //    //logger.Information("Configured HttpLogging with fields: {LoggingFields}", 
 //    //    options.LoggingFields.ToString());
-     
+
 //});
 
 
@@ -91,8 +99,25 @@ app.UseHttpsRedirection();
 app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
 app.UseAuthentication();
+
 app.UseAuthorization();
+
+// Register SOAP endpoint
+//app.UseSoapEndpoint<IOrderSoapService>(
+//    "/OrderService.svc",                   // SOAP URL
+//    new SoapEncoderOptions(),              // optional encoder settings
+//    SoapSerializer.DataContractSerializer  // serializer
+//);
+
+app.UseSoapEndpoint<IOrderSoapService>("/soap/OrderService", new SoapEncoderOptions());
+
 app.MapControllers();
+
+
+//conventinal routing
+app.MapControllerRoute(
+    name: "getAddresses",
+    pattern: "api/{controller=CustomerAddress}/{action=GetAddresses}/{custNo?}");
 
 //use middleware to log req and res
 //app.UseHttpLogging();

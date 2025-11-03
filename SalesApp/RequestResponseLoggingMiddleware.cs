@@ -19,25 +19,25 @@ public class RequestResponseLoggingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
+
         //Request
         string requestBody = await ReadRequestBody(context.Request);
         var headersToLog = new[] { "Content-Type", "Host" };
         string requestHeaders = string.Join(", ", context.Request.Headers
-            .Where(h=>headersToLog.Contains(h.Key,StringComparer.OrdinalIgnoreCase))
+            .Where(h => headersToLog.Contains(h.Key, StringComparer.OrdinalIgnoreCase))
             .Select(h => $"[{h.Key}: {h.Value}]"));
 
         string queryParams = string.Join(", ",
             context.Request.Query.Select(q => $"[{q.Key}, {q.Value}]"));
 
         string routeParams = string.Join(", ",
-            context.Request.RouteValues.Select(rv => $"[{rv.Key}, {rv.Value}]"));
+            context.Request.RouteValues.Select(rp => $"[{rp.Key}, {rp.Value}]"));
 
         string requestLog = $"Incoming Request: {context.Request.Method} {context.Request.Path}\n" +
                             $"Headers: {requestHeaders}\n" +
                             $"Route Params: {routeParams}\n" +
                             $"Query Params: {queryParams}\n" +
                             $"Body: {requestBody}\n";
-     
 
         var originalBodyStream = context.Response.Body;
         using var responseBody = new MemoryStream();
@@ -47,16 +47,17 @@ public class RequestResponseLoggingMiddleware
 
         //Response
         string responseBodyText = await ReadResponseBody(context.Response);
-        string responseHeaders = string.Join(", ", context.Response.Headers.Select(h => $"[{h.Key}, {h.Value}]"));
+        string responseHeaders = string.Join(", ", context.Response.Headers
+            .Select(h => $"[{h.Key}, {h.Value}]"));
 
         string responseLog = $"Outgoing Response: {context.Response.StatusCode}\n" +
                              $"Headers: {responseHeaders}\n" +
                              $"Body: {responseBodyText}\n" +
                              $"------------------------------------------------------------\n\n";
 
-        string logEntry = requestLog +"\n" +responseLog;
+        string logEntry = requestLog + "\n" + responseLog;
 
-   
+
         await WriteLogToFileAsync(logEntry);
 
 

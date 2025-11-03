@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace SalesApp.Models
 {
@@ -18,17 +19,26 @@ namespace SalesApp.Models
         public int Price { get; set; }
     }
 
+    [DataContract]
     public class OrderData
     {
+        [DataMember]
         public string PartNumber { get; set; }
+        [DataMember]
         public string PartName { get; set; }
+        [DataMember]
         public int Year { get; set; }
+        [DataMember]
         public string Make { get; set; }
+        [DataMember]
         public string Model { get; set; }
+        [DataMember]
         public int Price { get; set; }
     }
+    [DataContract]
     public class SaveOrder
     {
+        [DataMember]
         public List<OrderData> orders { get; set; }
     }
 }
