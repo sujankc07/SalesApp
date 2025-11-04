@@ -15,34 +15,66 @@ namespace SalesApp.Soap_Endpoint
             _context = context;
         }
 
+        //public async Task<string> SaveOrderAsync(string custNo, SaveOrder request)
+        //{
+        //    if (request == null || !request.orders.Any())
+        //    {
+        //        return "Invalid request";
+        //    }
+
+        //    string custNum = custNo;
+
+        //    List<OrderData> orders = request.orders;
+
+        //    var orderList = orders.Select(p => new Order
+        //    {
+        //        CustomerNumber = custNum,
+        //        PartNumber = p.PartNumber,
+        //        PartName = p.PartName,
+        //        Year = p.Year,
+        //        Make = p.Make,
+        //        Model = p.Model,
+        //        Price = p.Price
+        //    }).ToList();
+
+        //    _context.Orders.AddRange(orderList);
+        //    await _context.SaveChangesAsync();
+
+        //    return "Order saved successfully";
+
+        //}
+
         public async Task<string> SaveOrderAsync(string custNo, SaveOrder request)
         {
-            if (request == null || !request.orders.Any())
+            try
             {
-                return "Invalid request";
+                if (request == null || request.orders == null || !request.orders.Any())
+                    return "Invalid request";
+
+                string custNum = custNo;
+
+                var orderList = request.orders.Select(p => new Order
+                {
+                    CustomerNumber = custNum,
+                    PartNumber = p.PartNumber,
+                    PartName = p.PartName,
+                    Year = p.Year,
+                    Make = p.Make,
+                    Model = p.Model,
+                    Price = p.Price
+                }).ToList();
+
+                _context.Orders.AddRange(orderList);
+                await _context.SaveChangesAsync();
+
+                return "Order saved successfully";
             }
-
-            string custNum = custNo;
-
-            List<OrderData> orders = request.orders;
-
-            var orderList = orders.Select(p => new Order
+            catch (Exception ex)
             {
-                CustomerNumber = custNum,
-                PartNumber = p.PartNumber,
-                PartName = p.PartName,
-                Year = p.Year,
-                Make = p.Make,
-                Model = p.Model,
-                Price = p.Price
-            }).ToList();
-
-            _context.Orders.AddRange(orderList);
-            await _context.SaveChangesAsync();
-
-            return "Order saved successfully";
-
+                return $"Error: {ex.Message}";
+            }
         }
+
 
         public async Task<List<OrderData>>  GetOrders(string custNo)
         {
@@ -58,7 +90,9 @@ namespace SalesApp.Soap_Endpoint
                     Price = y.Price
                 }).ToList();
 
-            return result; 
+                return result; 
+    
+
         }
     }
 

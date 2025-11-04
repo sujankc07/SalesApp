@@ -9,6 +9,8 @@ using SalesApp.Services;
 using SalesApp.Soap_Endpoint;
 using Serilog;
 using SoapCore;
+using SoapCore.Extensibility;
+using SoapCore.ServiceModel;
 using System.ServiceModel;
 using System.Text;
 
@@ -20,6 +22,10 @@ builder.Services.AddControllers();
 builder.Services.AddCors();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
+
+builder.Services.AddSoapCore();
+// Register the SOAP service
+builder.Services.AddScoped<IOrderSoapService, OrderSoapService>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -59,8 +65,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("dbcon")));
 
 
 
-// Register the SOAP service
-builder.Services.AddScoped<IOrderSoapService, OrderSoapService>();
+
 
 
 //CONFIGURE SERILOG TO LOG REQ AND RES TO FILE
@@ -96,6 +101,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 app.UseMiddleware<RequestResponseLoggingMiddleware>();
 app.UseAuthentication();
@@ -109,20 +115,39 @@ app.UseAuthorization();
 //    SoapSerializer.DataContractSerializer  // serializer
 //);
 
-app.UseSoapEndpoint<IOrderSoapService>("/soap/OrderService", new SoapEncoderOptions());
+//app.UseSoapEndpoint<IOrderSoapService>("/soap/OrderService", new SoapEncoderOptions(), SoapSerializer.DataContractSerializer);
 
-app.MapControllers();
+//app.MapControllers();
 
 
 //conventinal routing
-app.MapControllerRoute(
-    name: "getAddresses",
-    pattern: "api/{controller=CustomerAddress}/{action=GetAddresses}/{custNo?}");
+//app.MapControllerRoute(
+//    name: "getAddresses",
+//    pattern: "api/{controller=CustomerAddress}/{action=GetAddresses}/{custNo?}");
 
 //use middleware to log req and res
 //app.UseHttpLogging();
 
 //app.UseMiddleware();
+
+
+
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.UseSoapEndpoint<IOrderSoapService>(
+        "/soap/OrderService",
+        new SoapEncoderOptions(),
+        SoapSerializer.DataContractSerializer
+    );
+    
+    endpoints.MapControllers();
+
+    endpoints.MapControllerRoute(
+        name: "getAddresses",
+        pattern: "api/{controller=CustomerAddress}/{action=GetAddresses}/{custNo?}"
+    );
+});
 
 
 

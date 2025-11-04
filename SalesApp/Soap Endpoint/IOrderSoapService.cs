@@ -10,5 +10,5 @@ public interface IOrderSoapService
     Task<string> SaveOrderAsync(string custNo, SaveOrder request);
 
     [OperationContract]
-    Task<List<OrderData>> GetOrders(string custNo);
+     Task<List<OrderData>> GetOrders(string custNo);
 }
