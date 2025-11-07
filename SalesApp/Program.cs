@@ -1,17 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SalesApp;
 using SalesApp.Data;
 using SalesApp.Services;
 using SalesApp.Soap_Endpoint;
-using Serilog;
 using SoapCore;
-using SoapCore.Extensibility;
-using SoapCore.ServiceModel;
-using System.ServiceModel;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -140,7 +133,7 @@ app.UseEndpoints(endpoints =>
         new SoapEncoderOptions(),
         SoapSerializer.DataContractSerializer
     );
-    
+
     endpoints.MapControllers();
 
     endpoints.MapControllerRoute(

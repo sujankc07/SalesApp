@@ -1,13 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SalesApp.Data;
 using SalesApp.Models;
+using System.Data.SqlClient;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SalesApp.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Microsoft.AspNetCore.Mvc.Route("api/[controller]")]
     [ApiController]
     public class CustomerAddressController : ControllerBase
     {
@@ -42,31 +47,41 @@ namespace SalesApp.Controllers
         [HttpGet]
         public IActionResult GetAddresses(string custNo)
         {
-            var primaryAddress = _customerContext.Customers
-                .Where(c => c.CustomerNumber == custNo)
-                .Select(c =>c.Address)
-                .FirstOrDefault();
+            //var primaryAddress = _customerContext.Customers
+            //    .Where(c => c.CustomerNumber == custNo)
+            //    .Select(c =>c.Address)
+            //    .FirstOrDefault();
 
-            var additionalAddresses = _context.Addresses.Where(a => a.CustomerNumber == custNo)
-                .Select(a => a.Address)
-                .ToList();
+            //var additionalAddresses = _context.Addresses.Where(a => a.CustomerNumber == custNo)
+            //    .Select(a => a.Address)
+            //    .ToList();
 
-            var allAddresses = new List<object>();
+            //var allAddresses = new List<object>();
 
-            if (primaryAddress != null)
-                allAddresses.Add(primaryAddress);
+            //if (primaryAddress != null)
+            //    allAddresses.Add(primaryAddress);
 
-            allAddresses.AddRange(additionalAddresses);
+            //allAddresses.AddRange(additionalAddresses);
 
-            return Ok(allAddresses);
+            //return Ok(allAddresses);
+
+            var addresses = _context.AddressInfos
+                        .FromSqlInterpolated($"EXEC dbo.CallGetAddress {custNo}");
+
+            return Ok(addresses);
+
+
+
+
+
         }
-
 
         //shipping address
         [HttpGet("getShippingAddress")]
         public IActionResult GetCustomerDetailsByAdd(string address)
         {
-            var result = _customerContext.Customers.Where(x => x.Address == address).Select(y => new { y.Address, y.City, y.State, y.PostalCode }).FirstOrDefault();
+            var result = _customerContext.Customers.Where(x => x.Address == address).Select(y => new { y.Address, y.City, y.State, y.PostalCode })
+                .FirstOrDefault();
 
             var result2 = _context.Addresses.Where(x=>x.Address == address).Select(y => new { y.Address, y.City, y.State, y.PostalCode }).FirstOrDefault();
 

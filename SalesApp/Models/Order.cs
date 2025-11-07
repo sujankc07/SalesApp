@@ -9,7 +9,7 @@ namespace SalesApp.Models
     public class Order
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int OrderID { get; set; }
+        public int OrderID { get; set; } 
 
         [DataMember(Order = 1)]
         public string CustomerNumber { get; set; }

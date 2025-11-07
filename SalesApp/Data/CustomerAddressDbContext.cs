@@ -11,6 +11,10 @@ namespace SalesApp.Data
         }
 
         public DbSet<CustomerAddress> Addresses { get; set; }
-        
+
+        public DbSet<AddressInfo> AddressInfos { get; set; }
+
     }
+
+
 }

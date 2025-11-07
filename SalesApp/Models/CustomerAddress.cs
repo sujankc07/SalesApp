@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SalesApp.Models
@@ -15,4 +16,13 @@ namespace SalesApp.Models
         public string State { get; set; }
         public string PostalCode { get; set; }
     }
+
+    [Keyless]
+
+    public class AddressInfo
+    {
+        public string Address { get; set; }
+    }
+
+
 }
